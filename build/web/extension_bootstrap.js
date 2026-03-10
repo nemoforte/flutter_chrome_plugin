@@ -1,0 +1,3 @@
+window.flutterConfiguration = {
+  canvasKitBaseUrl: "canvaskit/"
+};
