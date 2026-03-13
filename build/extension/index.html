@@ -1,0 +1,20 @@
+<!doctype html>
+<html style="height: 600px; width: 350px">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="./" />
+
+    <!-- Najpierw konfiguracja (już jako external) -->
+    <script src="extension_bootstrap.js" defer></script>
+
+    <!-- Potem loader -->
+    <script src="flutter.js" defer></script>
+
+    <!-- Potem bootstrap (musi być po flutter.js) -->
+    <script src="flutter_bootstrap.js" defer></script>
+</head>
+<body>
+<div id="flutter_target"></div>
+</body>
+</html>

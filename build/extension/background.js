@@ -1,42 +1,33 @@
-chrome.action.onClicked.addListener(async () => {
-  const url = chrome.runtime.getURL("index.html");
-  await chrome.tabs.create({ url });
-});
-
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === "PING") {
-    sendResponse({
-      ok: true,
-      message: "Hej z background.js",
-      time: new Date().toLocaleTimeString(),
-    });
+  console.log('background dostał:', request);
+
+  if (request === 'PING') {
+    sendResponse({ message: 'PONG z background.js' });
+    return;
   }
-});
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-
-  if (request.type === "GET_TITLE") {
-
+  if (request === 'GET_TITLE') {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-
       const tabId = tabs[0]?.id;
 
       if (!tabId) {
-        sendResponse({ title: "no active tab" });
+        sendResponse({ title: 'Brak aktywnej karty' });
         return;
       }
 
-      chrome.tabs.sendMessage(
-        tabId,
-        { type: "GET_TITLE" },
-        (response) => {
-          sendResponse(response ?? { title: "no response from content" });
+      chrome.tabs.sendMessage(tabId, 'GET_TITLE', (response) => {
+        if (chrome.runtime.lastError) {
+          console.error('tabs.sendMessage error:', chrome.runtime.lastError.message);
+          sendResponse({ title: 'Nie udało się pobrać tytułu strony' });
+          return;
         }
-      );
 
+        sendResponse(response ?? { title: 'Brak odpowiedzi z content.js' });
+      });
     });
 
     return true;
   }
 
+  sendResponse({ message: 'Nieznany request' });
 });

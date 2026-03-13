@@ -14,9 +14,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: MyHomePage(),
-    );
+    return const MaterialApp(home: MyHomePage());
   }
 }
 
@@ -32,18 +30,47 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void pingBackground() {
     setState(() {
-      status = 'Wysyłam wiadomość...';
+      status = 'Wysyłam PING...';
     });
 
     sendMessage(
-      {'type': 'PING'},
+      'PING',
       allowInterop((response) {
-        final ok = js_util.getProperty(response, 'ok');
+        if (response == null) {
+          setState(() {
+            status = 'Brak odpowiedzi z background.js';
+          });
+          return;
+        }
+
         final message = js_util.getProperty(response, 'message');
-        final time = js_util.getProperty(response, 'time');
 
         setState(() {
-          status = 'ok=$ok, message=$message, time=$time';
+          status = 'Odpowiedź: $message';
+        });
+      }),
+    );
+  }
+
+  void getTitle() {
+    setState(() {
+      status = 'Pobieram tytuł strony...';
+    });
+
+    sendMessage(
+      'GET_TITLE',
+      allowInterop((response) {
+        if (response == null) {
+          setState(() {
+            status = 'Brak odpowiedzi';
+          });
+          return;
+        }
+
+        final title = js_util.getProperty(response, 'title');
+
+        setState(() {
+          status = 'Tytuł strony: $title';
         });
       }),
     );
@@ -52,24 +79,23 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Flutter Extension Test'),
-      ),
+      appBar: AppBar(title: const Text('Flutter Extension Test')),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                status,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 18),
-              ),
+              Text(status, textAlign: TextAlign.center),
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: pingBackground,
                 child: const Text('Wyślij PING do background'),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: getTitle,
+                child: const Text('Pobierz tytuł strony'),
               ),
             ],
           ),
